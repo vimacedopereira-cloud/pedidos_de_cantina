@@ -18,7 +18,6 @@ public class ProdutoController {
         this.produtoRepository = produtoRepository;
     }
 
-    // Rota: POST /produtos (Cadastrar produto)
     @PostMapping
     public ResponseEntity<String> cadastrarProduto(@RequestBody Produto produto) {
         try {
@@ -29,10 +28,14 @@ public class ProdutoController {
         }
     }
 
-    // Rota: GET /produtos (Apenas a assinatura inicial para listar produtos)
-    // Para funcionar completamente, precisaremos de criar o método listar() no ProdutoRepository
+    // Rota GET atualizada usando o novo método listar do repositório
     @GetMapping
-    public ResponseEntity<String> listarProdutos() {
-        return ResponseEntity.ok("Aqui será devolvida a lista de produtos.");
+    public ResponseEntity<List<Produto>> listarProdutos() {
+        try {
+            List<Produto> produtos = produtoRepository.listar();
+            return ResponseEntity.ok(produtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
