@@ -18,7 +18,7 @@ public class ClienteRepository {
     }
 
     public void cadastrar(Cliente cliente) {
-        String sql = "INSERT INTO cliente (nome, email) VALUES (?, ?)";
+        String sql = "INSERT INTO clientes (nome, email) VALUES (?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

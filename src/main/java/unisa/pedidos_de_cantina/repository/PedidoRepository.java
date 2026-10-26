@@ -19,7 +19,7 @@ public class PedidoRepository {
     }
 
     public void registrar(Pedido pedido) {
-        String sql = "INSERT INTO pedido (cliente_id, produto_id, preco_registrado, data, situacao) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pedidos (cliente_id, produto_id, preco_registrado, data_registro, situacao) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

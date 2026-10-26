@@ -21,7 +21,7 @@ public class ProdutoRepository {
     }
 
     public void cadastrar(Produto produto) {
-        String sql = "INSERT INTO produto (nome, preco, estoque_disponivel) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO produtos (nome, preco, estoque_disponivel) VALUES (?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, produto.getNome());
@@ -35,7 +35,7 @@ public class ProdutoRepository {
 
     // Novo método para listar os produtos (SELECT)
     public List<Produto> listar() {
-        String sql = "SELECT id, nome, preco, estoque_disponivel FROM produto";
+        String sql = "SELECT id, nome, preco, estoque_disponivel FROM produtos";
         List<Produto> produtos = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
