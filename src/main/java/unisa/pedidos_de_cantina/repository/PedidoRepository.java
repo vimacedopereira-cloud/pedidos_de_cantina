@@ -85,4 +85,51 @@ public class PedidoRepository {
 
         return pedidos;
     }
+    public Pedido buscarPorId(Long id) {
+        String sql = "SELECT p.id, p.preco_registrado, p.data_registro, p.situacao, " +
+                     "c.id AS cliente_id, " +
+                     "pr.id AS produto_id, pr.estoque_disponivel " +
+                     "FROM pedidos p " +
+                     "JOIN clientes c ON p.cliente_id = c.id " +
+                     "JOIN produtos pr ON p.produto_id = pr.id " +
+                     "WHERE p.id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setLong(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setId(rs.getLong("cliente_id"));
+
+                Produto produto = new Produto();
+                produto.setId(rs.getLong("produto_id"));
+                produto.setEstoqueDisponivel(rs.getInt("estoque_disponivel"));
+
+                Pedido pedido = new Pedido();
+                pedido.setId(rs.getLong("id"));
+                pedido.setCliente(cliente);
+                pedido.setProduto(produto);
+                pedido.setSituacao(rs.getString("situacao"));
+                return pedido;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar pedido por ID", e);
+        }
+    }
+
+    public void atualizarSituacao(Long id, String situacao) {
+        String sql = "UPDATE pedidos SET situacao = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, situacao);
+            stmt.setLong(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar situação do pedido", e);
+        }
+    }
 }

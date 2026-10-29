@@ -55,4 +55,19 @@ public class ProdutoRepository {
         }
         return produtos;
     }
+    public void atualizarEstoque(Produto produto) {
+        String sql = "UPDATE produtos SET estoque_disponivel = ? WHERE id = ?";
+
+        try (java.sql.Connection conn = dataSource.getConnection();
+             java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, produto.getEstoqueDisponivel());
+            stmt.setLong(2, produto.getId());
+
+            stmt.executeUpdate();
+
+        } catch (java.sql.SQLException e) {
+            throw new RuntimeException("Erro ao atualizar o stock na base de dados", e);
+        }
+    }
 }

@@ -35,11 +35,30 @@ public class PedidoService {
         // Regra de negócio: Baixar uma unidade do stock
         produto.setEstoqueDisponivel(produto.getEstoqueDisponivel() - 1);
 
-        // Numa implementação completa, deverá existir um método atualizar no ProdutoRepository 
-        // para gravar a nova quantidade de stock na base de dados:
-        // produtoRepository.atualizarEstoque(produto);
+        // Gravar a nova quantidade de stock na base de dados
+        produtoRepository.atualizarEstoque(produto);
 
         // Gravar o pedido na base de dados
         pedidoRepository.registrar(pedido);
+    }
+
+    @Transactional
+    public void cancelarPedido(Long pedidoId) {
+        Pedido pedido = pedidoRepository.buscarPorId(pedidoId);
+        
+        if (pedido == null) {
+            throw new IllegalArgumentException("Pedido não encontrado.");
+        }
+        if ("CANCELADO".equals(pedido.getSituacao())) {
+            throw new IllegalArgumentException("O pedido já se encontra cancelado.");
+        }
+
+        // 1. Muda a situação para CANCELADO
+        pedidoRepository.atualizarSituacao(pedidoId, "CANCELADO");
+
+        // 2. Devolve +1 ao stock do produto
+        Produto produto = pedido.getProduto();
+        produto.setEstoqueDisponivel(produto.getEstoqueDisponivel() + 1);
+        produtoRepository.atualizarEstoque(produto);
     }
 }

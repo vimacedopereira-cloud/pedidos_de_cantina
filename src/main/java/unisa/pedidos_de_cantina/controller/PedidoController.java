@@ -39,4 +39,17 @@ public class PedidoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao processar o pedido.");
         }
     }
+
+    // Rota PUT /pedidos/{id}/cancelar (Cancelar pedido e devolver stock)
+    @PutMapping("/{id}/cancelar")
+    public ResponseEntity<String> cancelarPedido(@PathVariable Long id) {
+        try {
+            pedidoService.cancelarPedido(id);
+            return ResponseEntity.ok("Pedido cancelado com sucesso. Stock devolvido!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao cancelar pedido.");
+        }
+    }
 }
