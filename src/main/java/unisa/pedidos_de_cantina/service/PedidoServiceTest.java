@@ -15,7 +15,6 @@ public class PedidoServiceTest {
     @Test
     public void deveLancarExcecaoQuandoProdutoNaoTemEstoque() {
         // 1. Preparação dos dados (Arrange)
-        // Usamos "mock" para simular o banco de dados sem precisar conectar a ele no teste
         PedidoRepository pedidoRepositoryMock = mock(PedidoRepository.class);
         ProdutoRepository produtoRepositoryMock = mock(ProdutoRepository.class);
         
@@ -29,12 +28,10 @@ public class PedidoServiceTest {
         Pedido pedido = new Pedido();
 
         // 2. Execução (Act) e 3. Verificação (Assert)
-        // Verifica se a tentativa de registrar o pedido lança um IllegalArgumentException
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             pedidoService.registrarPedido(pedido, produtoSemEstoque);
         });
 
-        // Verifica se a mensagem de erro é exatamente a que definimos na regra de negócio
         assertEquals("Erro: Produto sem stock disponível.", exception.getMessage());
     }
 }
