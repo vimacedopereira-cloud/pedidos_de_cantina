@@ -18,17 +18,15 @@ public class ClienteController {
         this.clienteRepository = clienteRepository;
     }
 
-    // Rota GET /clientes - Listar todos os clientes
     @GetMapping
     public ResponseEntity<List<Cliente>> listarClientes() {
-        return ResponseEntity.ok(clienteRepository.listarTodos());
+        return ResponseEntity.ok(clienteRepository.listar());
     }
 
-    // Rota POST /clientes - Registar novo cliente
     @PostMapping
     public ResponseEntity<String> registrarCliente(@RequestBody Cliente cliente) {
         try {
-            clienteRepository.salvar(cliente);
+            clienteRepository.cadastrar(cliente);
             return ResponseEntity.status(HttpStatus.CREATED).body("Cliente cadastrado com sucesso!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao cadastrar cliente.");

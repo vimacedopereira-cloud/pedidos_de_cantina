@@ -1,39 +1,43 @@
-package unisa.pedidos_de_cantina.repository;
+public java.util.List<Pedido> listarTodos() {
+        String sql = "SELECT p.id, p.preco_registrado, p.data_registro, p.situacao, " +
+                     "c.id AS cliente_id, c.nome AS cliente_nome, c.email AS cliente_email, " +
+                     "pr.id AS produto_id, pr.nome AS produto_nome, pr.preco AS produto_preco, pr.estoque_disponivel " +
+                     "FROM pedidos p " +
+                     "JOIN clientes c ON p.cliente_id = c.id " +
+                     "JOIN produtos pr ON p.produto_id = pr.id " +
+                     "ORDER BY p.id";
 
-import org.springframework.stereotype.Repository;
-import unisa.pedidos_de_cantina.model.Pedido;
+        java.util.List<Pedido> pedidos = new java.util.ArrayList<>();
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+        try (java.sql.Connection conn = dataSource.getConnection();
+             java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+             java.sql.ResultSet rs = stmt.executeQuery()) {
 
-@Repository
-public class PedidoRepository {
+            while (rs.next()) {
+                unisa.pedidos_de_cantina.model.Cliente cliente = new unisa.pedidos_de_cantina.model.Cliente();
+                cliente.setId(rs.getLong("cliente_id"));
+                cliente.setNome(rs.getString("cliente_nome"));
+                cliente.setEmail(rs.getString("cliente_email"));
 
-    private final DataSource dataSource;
+                unisa.pedidos_de_cantina.model.Produto produto = new unisa.pedidos_de_cantina.model.Produto();
+                produto.setId(rs.getLong("produto_id"));
+                produto.setNome(rs.getString("produto_nome"));
+                produto.setPreco(rs.getDouble("produto_preco"));
+                produto.setEstoqueDisponivel(rs.getInt("estoque_disponivel"));
 
-    public PedidoRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+                Pedido pedido = new Pedido();
+                pedido.setId(rs.getLong("id"));
+                pedido.setCliente(cliente);
+                pedido.setProduto(produto);
+                pedido.setPrecoRegistrado(rs.getDouble("preco_registrado"));
+                pedido.setData(rs.getTimestamp("data_registro").toLocalDateTime());
+                pedido.setSituacao(rs.getString("situacao"));
 
-    public void registrar(Pedido pedido) {
-        String sql = "INSERT INTO pedidos (cliente_id, produto_id, preco_registrado, data_registro, situacao) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setLong(1, pedido.getCliente().getId());
-            stmt.setLong(2, pedido.getProduto().getId());
-            stmt.setDouble(3, pedido.getPrecoRegistrado());
-            stmt.setTimestamp(4, Timestamp.valueOf(pedido.getData()));
-            stmt.setString(5, pedido.getSituacao());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao registrar pedido na base de dados", e);
+                pedidos.add(pedido);
+            }
+        } catch (java.sql.SQLException e) {
+            throw new RuntimeException("Erro ao buscar pedidos no banco de dados", e);
         }
+
+        return pedidos;
     }
-}
